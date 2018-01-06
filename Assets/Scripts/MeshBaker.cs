@@ -20,12 +20,12 @@ namespace FortyWorks.SmarTrail
             Mesh = new Mesh();
         }
 
-        public void Bake(List<WayPoint> wayPoints)
+        public void Bake(List<WayPoint> wayPoints, Vector3 currentPosition)
         {
             Mesh.Clear();
             if (wayPoints.Count < 2) return;
             
-            var vertices = CreateVertice(wayPoints).Select(x => x.Point).ToArray();
+            var vertices = CreateVertice(wayPoints, currentPosition).Select(x => x.Point).ToArray();
             var uv = CreateUvMap(wayPoints.Count).ToArray();
             var triangles = CreateTriangles(wayPoints.Count).ToArray();
             var colors = CreateVertexColor(wayPoints).ToArray();
@@ -41,7 +41,7 @@ namespace FortyWorks.SmarTrail
             return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
             {
                 var element = wayPoints.ElementAt(index);
-                var lerp = InverseLifeTime(element);
+                var lerp = ClampLifeTime(element);
                 var color = _colorGradient.Evaluate(lerp);
                     
                 return new[]
@@ -52,13 +52,12 @@ namespace FortyWorks.SmarTrail
             });
         }
 
-
-        private float InverseLifeTime(WayPoint wayPoint)
+        private float ClampLifeTime(WayPoint wayPoint)
         {
-            return Mathf.InverseLerp(
+            return Mathf.Clamp(
+                (Time.time - wayPoint.CreatedAt) / _lifeTime,
                 0f, 
-                1f, 
-                (Time.time - wayPoint.CreatedAt) / _lifeTime
+                1f
             );
         }
         
@@ -84,18 +83,17 @@ namespace FortyWorks.SmarTrail
             });
         }
 
-        private IEnumerable<Vertex> CreateVertice(List<WayPoint> wayPoints)
+        private IEnumerable<Vertex> CreateVertice(List<WayPoint> wayPoints, Vector3 currentPosition)
         {
-            return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
+            return wayPoints.SelectMany(element =>
             {
-                var element = wayPoints.ElementAt(index);
-                var lerp = InverseLifeTime(element);
+                var lerp = ClampLifeTime(element);
                 var width = _widthCurve.Evaluate(lerp);
 
                 return new[]
                 {
-                    new Vertex(element.ToBasePosition(width), index * 2),
-                    new Vertex(element.ToForwardPosition(width), index * 2 - 1),
+                    new Vertex(element.ToBasePosition(width)),
+                    new Vertex(element.ToForwardPosition(width)),
                 };
             });
         }

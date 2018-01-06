@@ -28,6 +28,7 @@ namespace FortyWorks.SmarTrail
 
 		private MeshFilter _meshFilter;
 		private MeshRenderer _meshRenderer;
+		private GameObject _child;
 			
 		public void Start()
 		{
@@ -42,16 +43,23 @@ namespace FortyWorks.SmarTrail
 
 		private void SetupComponents()
 		{
-			GameObject go = new GameObject();
-			_meshFilter = go.AddComponent<MeshFilter>();
-			_meshRenderer = go.AddComponent<MeshRenderer>();
-			go.transform.SetParent(transform, false);
+			_child = new GameObject();
+			
+			_meshFilter = _child.AddComponent<MeshFilter>();
+			_meshRenderer = _child.AddComponent<MeshRenderer>();
+			
+			_child.transform.SetParent(transform, false);
+			_child.name = "SmarTrailMesh (Dynamic)";
 		}
 
 		public void Update()
 		{
 			_pointTracer.Update(transform);
-			_baker.Bake(_pointTracer.WayPoints);
+			_baker.Bake(_pointTracer.WayPoints, transform.position);
+			
+			_child.transform.position = Vector3.zero;
+			_child.transform.rotation = Quaternion.identity;
+			_child.transform.localScale = Vector3.one;
 		}
 	}
 }
