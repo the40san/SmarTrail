@@ -36,6 +36,9 @@
           <e p="Vertex.cs" t="Include" />
           <e p="WayPoint.cs" t="Include" />
         </e>
+        <e p="Shaders" t="Include">
+          <e p="Default-Trail.shader" t="Include" />
+        </e>
       </e>
       <e p="Library" t="ExcludeRecursive" />
       <e p="obj" t="ExcludeRecursive" />
