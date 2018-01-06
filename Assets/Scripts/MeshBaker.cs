@@ -20,12 +20,12 @@ namespace FortyWorks.SmarTrail
             Mesh = new Mesh();
         }
 
-        public void Bake(List<WayPoint> wayPoints, Vector3 currentPosition)
+        public void Bake(List<WayPoint> wayPoints)
         {
             Mesh.Clear();
             if (wayPoints.Count < 2) return;
             
-            var vertices = CreateVertice(wayPoints, currentPosition).Select(x => x.Point).ToArray();
+            var vertices = CreateVertice(wayPoints).Select(x => x.Point).ToArray();
             var uv = CreateUvMap(wayPoints.Count).ToArray();
             var triangles = CreateTriangles(wayPoints.Count).ToArray();
             var colors = CreateVertexColor(wayPoints).ToArray();
@@ -41,8 +41,7 @@ namespace FortyWorks.SmarTrail
             return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
             {
                 var element = wayPoints.ElementAt(index);
-                var lerp = ClampLifeTime(element);
-                var color = _colorGradient.Evaluate(lerp);
+                var color = _colorGradient.Evaluate(1 - ((float)index / wayPoints.Count));
                     
                 return new[]
                 {
@@ -50,15 +49,6 @@ namespace FortyWorks.SmarTrail
                     color 
                 };
             });
-        }
-
-        private float ClampLifeTime(WayPoint wayPoint)
-        {
-            return Mathf.Clamp(
-                (Time.time - wayPoint.CreatedAt) / _lifeTime,
-                0f, 
-                1f
-            );
         }
         
         private IEnumerable<int> CreateTriangles(int pointCount)
@@ -83,12 +73,12 @@ namespace FortyWorks.SmarTrail
             });
         }
 
-        private IEnumerable<Vertex> CreateVertice(List<WayPoint> wayPoints, Vector3 currentPosition)
+        private IEnumerable<Vertex> CreateVertice(List<WayPoint> wayPoints)
         {
-            return wayPoints.SelectMany(element =>
+            return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
             {
-                var lerp = ClampLifeTime(element);
-                var width = _widthCurve.Evaluate(lerp);
+                var element = wayPoints.ElementAt(index);
+                var width = _widthCurve.Evaluate(1 - ((float)index / wayPoints.Count));
 
                 return new[]
                 {

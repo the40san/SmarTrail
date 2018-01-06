@@ -55,7 +55,7 @@ namespace FortyWorks.SmarTrail
 		public void Update()
 		{
 			_pointTracer.Update(transform);
-			_baker.Bake(_pointTracer.WayPoints, transform.position);
+			_baker.Bake(_pointTracer.WayPoints);
 			
 			_child.transform.position = Vector3.zero;
 			_child.transform.rotation = Quaternion.identity;
