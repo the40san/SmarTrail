@@ -9,14 +9,17 @@ namespace FortyWorks.SmarTrail
         private readonly AnimationCurve _widthCurve;
         private readonly float _lifeTime;
         private readonly Gradient _colorGradient;
+        private readonly Align _align;
 
         public Mesh Mesh { get; private set; }
 
-        public MeshBaker(AnimationCurve widthCurve, float lifeTime, Gradient colorGradient)
+        public MeshBaker(AnimationCurve widthCurve, float lifeTime, Gradient colorGradient, Align align)
         {
             _widthCurve = widthCurve;
             _lifeTime = lifeTime;
             _colorGradient = colorGradient;
+            _align = align;
+            
             Mesh = new Mesh();
         }
 
@@ -75,6 +78,7 @@ namespace FortyWorks.SmarTrail
 
         private IEnumerable<Vertex> CreateVertice(List<WayPoint> wayPoints)
         {
+            var maxWidth = _widthCurve.Evaluate(0);
             return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
             {
                 var element = wayPoints.ElementAt(index);
@@ -82,8 +86,8 @@ namespace FortyWorks.SmarTrail
 
                 return new[]
                 {
-                    new Vertex(element.ToBasePosition(width)),
-                    new Vertex(element.ToForwardPosition(width)),
+                    new Vertex(element.ToBasePosition(width, maxWidth, _align)),
+                    new Vertex(element.ToForwardPosition(width, maxWidth, _align)),
                 };
             });
         }

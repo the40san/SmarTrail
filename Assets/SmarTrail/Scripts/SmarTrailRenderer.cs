@@ -9,6 +9,7 @@ namespace FortyWorks.SmarTrail
 		[SerializeField] private AnimationCurve _width;
 		[SerializeField] private float _minVertexDistance = 0.1f; 
 		[SerializeField] private Gradient _color;
+		[SerializeField] private Align _align = Align.Forward;
 
 		private PointTracer CreatePointTracer()
 		{
@@ -17,7 +18,7 @@ namespace FortyWorks.SmarTrail
 
 		private MeshBaker CreatemMeshBaker()
 		{
-			return new MeshBaker(_width, _time, _color);
+			return new MeshBaker(_width, _time, _color, _align);
 		}
 	}
 	
@@ -50,6 +51,12 @@ namespace FortyWorks.SmarTrail
 			
 			_child.transform.SetParent(transform, false);
 			_child.name = "SmarTrailMesh (Dynamic)";
+		}
+
+		private void OnDisable()
+		{
+			_baker.Mesh.Clear();
+			_pointTracer.WayPoints.Clear();
 		}
 
 		public void Update()
