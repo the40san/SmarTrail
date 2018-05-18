@@ -43,7 +43,6 @@ namespace FortyWorks.SmarTrail
         {
             return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
             {
-                var element = wayPoints.ElementAt(index);
                 var color = _colorGradient.Evaluate(1 - ((float)index / wayPoints.Count));
                     
                 return new[]
