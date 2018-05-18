@@ -23,12 +23,12 @@ namespace FortyWorks.SmarTrail
             Mesh = new Mesh();
         }
 
-        public void Bake(List<WayPoint> wayPoints)
+        public void Bake(List<WayPoint> wayPoints, Vector3 offset)
         {
             Mesh.Clear();
             if (wayPoints.Count < 2) return;
             
-            var vertices = CreateVertice(wayPoints).Select(x => x.Point).ToArray();
+            var vertices = CreateVertice(wayPoints, offset).Select(x => x.Point).ToArray();
             var uv = CreateUvMap(wayPoints.Count).ToArray();
             var triangles = CreateTriangles(wayPoints.Count).ToArray();
             var colors = CreateVertexColor(wayPoints).ToArray();
@@ -76,7 +76,7 @@ namespace FortyWorks.SmarTrail
             });
         }
 
-        private IEnumerable<Vertex> CreateVertice(List<WayPoint> wayPoints)
+        private IEnumerable<Vertex> CreateVertice(List<WayPoint> wayPoints, Vector3 offset)
         {
             var maxWidth = _widthCurve.Evaluate(0);
             return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
@@ -86,8 +86,8 @@ namespace FortyWorks.SmarTrail
 
                 return new[]
                 {
-                    new Vertex(element.ToBasePosition(width, maxWidth, _align)),
-                    new Vertex(element.ToForwardPosition(width, maxWidth, _align)),
+                    new Vertex(element.ToBasePosition(width, maxWidth, _align) - offset),
+                    new Vertex(element.ToForwardPosition(width, maxWidth, _align) - offset),
                 };
             });
         }

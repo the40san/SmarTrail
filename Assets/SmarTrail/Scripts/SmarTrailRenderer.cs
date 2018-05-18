@@ -23,6 +23,7 @@ namespace FortyWorks.SmarTrail
 		}
 	}
 	
+	[ExecuteInEditMode]
 	public partial class SmarTrailRenderer : MonoBehaviour
 	{
 		private MeshBaker _baker;
@@ -30,28 +31,30 @@ namespace FortyWorks.SmarTrail
 
 		private MeshFilter _meshFilter;
 		private MeshRenderer _meshRenderer;
-		private GameObject _child;
-			
-		public void Start()
-		{
-			_baker = CreateMeshBaker();
-			_pointTracer = CreatePointTracer();
-			
-			SetupComponents();
 
-			_meshFilter.mesh = _baker.Mesh;
-			_meshRenderer.materials = _materials;
-		}
+		private void OnEnable()
+		{
+			SetupComponents();
+   		}
 
 		private void SetupComponents()
 		{
-			_child = new GameObject();
+			if (_baker == null)
+                _baker = CreateMeshBaker();
 			
-			_meshFilter = _child.AddComponent<MeshFilter>();
-			_meshRenderer = _child.AddComponent<MeshRenderer>();
+			if (_pointTracer == null)
+                _pointTracer = CreatePointTracer();
+	
+			_meshFilter = GetComponent<MeshFilter>();
+			if (_meshFilter == null)
+				gameObject.AddComponent<MeshFilter>();
+
+			_meshRenderer = GetComponent<MeshRenderer>();
+			if (_meshRenderer == null)
+				gameObject.AddComponent<MeshRenderer>();
 			
-			_child.transform.SetParent(transform, false);
-			_child.name = "SmarTrailMesh (Dynamic)";
+			_meshFilter.mesh = _baker.Mesh;
+			_meshRenderer.materials = _materials;
 		}
 
 		private void OnDisable()
@@ -67,13 +70,11 @@ namespace FortyWorks.SmarTrail
 
 		public void Update()
 		{
+			if (_baker == null || _pointTracer == null)
+				SetupComponents();
+			
             _pointTracer.Update(transform, _tracking);
-			
-			_baker.Bake(_pointTracer.WayPoints);
-			
-			_child.transform.position = Vector3.zero;
-			_child.transform.rotation = Quaternion.identity;
-			_child.transform.localScale = Vector3.one;
+			_baker.Bake(_pointTracer.WayPoints, transform.position);
 		}
 	}
 }
