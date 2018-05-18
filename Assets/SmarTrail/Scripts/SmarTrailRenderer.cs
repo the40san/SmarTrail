@@ -45,14 +45,14 @@ namespace FortyWorks.SmarTrail
 			
 			if (_pointTracer == null)
                 _pointTracer = CreatePointTracer();
-	
+
 			_meshFilter = GetComponent<MeshFilter>();
 			if (_meshFilter == null)
-				gameObject.AddComponent<MeshFilter>();
+				_meshFilter = gameObject.AddComponent<MeshFilter>();
 
 			_meshRenderer = GetComponent<MeshRenderer>();
 			if (_meshRenderer == null)
-				gameObject.AddComponent<MeshRenderer>();
+				_meshRenderer = gameObject.AddComponent<MeshRenderer>();
 			
 			_meshFilter.mesh = _baker.Mesh;
 			_meshRenderer.materials = _materials;
