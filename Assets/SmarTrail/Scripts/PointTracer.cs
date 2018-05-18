@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace FortyWorks.SmarTrail
 {
-    public class PointTracer
+    public class PointTracer : IDisposable
     {
         public List<WayPoint> WayPoints;
         
@@ -46,6 +47,11 @@ namespace FortyWorks.SmarTrail
         private void Note(Transform transform)
         {
             WayPoints.Add(new WayPoint(transform.position, transform.forward));
+        }
+
+        public void Dispose()
+        {
+            WayPoints.Clear();
         }
     }
 }

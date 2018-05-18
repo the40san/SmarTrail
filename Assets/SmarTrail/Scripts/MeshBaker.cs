@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace FortyWorks.SmarTrail
 {
-    public class MeshBaker
+    public class MeshBaker : IDisposable
     {
         private readonly AnimationCurve _widthCurve;
         private readonly Gradient _colorGradient;
@@ -87,6 +88,11 @@ namespace FortyWorks.SmarTrail
                     new Vertex(element.ToForwardPosition(width, maxWidth, _align) - offset),
                 };
             });
+        }
+
+        public void Dispose()
+        {
+            Mesh.Clear();
         }
     }
 }

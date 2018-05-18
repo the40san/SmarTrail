@@ -59,8 +59,20 @@ namespace FortyWorks.SmarTrail
 
 		private void OnDisable()
 		{
-			_baker.Mesh.Clear();
-			_pointTracer.WayPoints.Clear();
+			Clean();
+    	}
+
+		private void OnValidate()
+		{
+			Clean();
+		}
+
+		public void Clean()
+		{
+			_baker?.Dispose();
+			_baker = null;
+			_pointTracer?.Dispose();
+			_pointTracer = null;
 		}
 
 		public void SetTracking(bool value)
