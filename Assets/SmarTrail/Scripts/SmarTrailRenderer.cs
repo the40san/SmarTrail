@@ -6,7 +6,7 @@ namespace FortyWorks.SmarTrail
 	{
 		[SerializeField] private Material[] _materials = { };
 		[SerializeField] private float _time = 5f;
-		[SerializeField] private AnimationCurve _widthCurve;
+		[SerializeField] private AnimationCurve _widthCurve = AnimationCurve.Linear(0, 0, 1, 1);
 		[SerializeField, Range(0, 1)] private float _widthMultiplier = 1.0f;
 		[SerializeField] private float _minVertexDistance = 0.1f; 
 		[SerializeField] private Gradient _color;
