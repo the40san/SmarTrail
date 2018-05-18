@@ -8,14 +8,16 @@ namespace FortyWorks.SmarTrail
     public class MeshBaker : IDisposable
     {
         private readonly AnimationCurve _widthCurve;
+        private readonly float _widthMultiplier;
         private readonly Gradient _colorGradient;
         private readonly Align _align;
 
         public Mesh Mesh { get; private set; }
 
-        public MeshBaker(AnimationCurve widthCurve, Gradient colorGradient, Align align)
+        public MeshBaker(AnimationCurve widthCurve, float widthMultiplier, Gradient colorGradient, Align align)
         {
             _widthCurve = widthCurve;
+            _widthMultiplier = widthMultiplier;
             _colorGradient = colorGradient;
             _align = align;
             
@@ -76,11 +78,11 @@ namespace FortyWorks.SmarTrail
 
         private IEnumerable<Vertex> CreateVertice(List<WayPoint> wayPoints, Vector3 offset)
         {
-            var maxWidth = _widthCurve.Evaluate(0);
+            var maxWidth = _widthCurve.Evaluate(0) * _widthMultiplier;
             return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
             {
                 var element = wayPoints.ElementAt(index);
-                var width = _widthCurve.Evaluate(1 - ((float)index / wayPoints.Count));
+                var width = _widthCurve.Evaluate(1 - ((float)index / wayPoints.Count)) * _widthMultiplier;
 
                 return new[]
                 {
