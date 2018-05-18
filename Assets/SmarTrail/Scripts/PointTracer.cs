@@ -20,8 +20,12 @@ namespace FortyWorks.SmarTrail
             _lifeTime = lifeTime;
         }
         
-        public void Update(Transform transform)
+        public void Update(Transform transform, bool tracking)
         {
+            RemoveEolPoints();
+
+            if (tracking == false) return;
+            
             var lastNotedPoint = WayPoints.LastOrDefault();
             if (lastNotedPoint == null)
             {
@@ -32,8 +36,6 @@ namespace FortyWorks.SmarTrail
             var distanceFromLast = Vector3.Distance(transform.position, lastNotedPoint.MidPosition);
             if (distanceFromLast >= _minVertexDistance)
                 Note(transform);
-
-            RemoveEolPoints();
         }
 
         private void RemoveEolPoints()
