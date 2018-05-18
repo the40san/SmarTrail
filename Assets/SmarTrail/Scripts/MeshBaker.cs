@@ -7,16 +7,14 @@ namespace FortyWorks.SmarTrail
     public class MeshBaker
     {
         private readonly AnimationCurve _widthCurve;
-        private readonly float _lifeTime;
         private readonly Gradient _colorGradient;
         private readonly Align _align;
 
         public Mesh Mesh { get; private set; }
 
-        public MeshBaker(AnimationCurve widthCurve, float lifeTime, Gradient colorGradient, Align align)
+        public MeshBaker(AnimationCurve widthCurve, Gradient colorGradient, Align align)
         {
             _widthCurve = widthCurve;
-            _lifeTime = lifeTime;
             _colorGradient = colorGradient;
             _align = align;
             

@@ -19,7 +19,7 @@ namespace FortyWorks.SmarTrail
 
 		private MeshBaker CreateMeshBaker()
 		{
-			return new MeshBaker(_width, _time, _color, _align);
+			return new MeshBaker(_width, _color, _align);
 		}
 	}
 	
