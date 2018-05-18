@@ -81,7 +81,7 @@ namespace FortyWorks.SmarTrail
 			_tracking = value;
 		}
 
-		public void Update()
+		private void Update()
 		{
 			if (_baker == null || _pointTracer == null)
 				SetupComponents();
