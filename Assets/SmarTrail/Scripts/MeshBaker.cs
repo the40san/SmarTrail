@@ -24,16 +24,19 @@ namespace FortyWorks.SmarTrail
             Mesh = new Mesh();
         }
 
-        public void Bake(List<WayPoint> wayPoints, Vector3 offset)
+        public void Bake(List<WayPoint> wayPoints, Transform transform)
         {
             Mesh.Clear();
             if (wayPoints.Count < 2) return;
-            
-            var vertices = CreateVertice(wayPoints, offset).Select(x => x.Point).ToArray();
+
+            var offsetToCancel = transform.position;
+            var rotationToCancel = transform.rotation;
+
+            var vertices = CreateVertice(wayPoints, offsetToCancel).Select(x => Quaternion.Inverse(rotationToCancel) * x.Point).ToArray();
             var uv = CreateUvMap(wayPoints.Count).ToArray();
             var triangles = CreateTriangles(wayPoints.Count).ToArray();
             var colors = CreateVertexColor(wayPoints).ToArray();
-                
+
             Mesh.vertices = vertices;
             Mesh.uv = uv;
             Mesh.triangles = triangles;
