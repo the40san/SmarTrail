@@ -46,7 +46,7 @@ namespace FortyWorks.SmarTrail
 
         private void Note(Transform transform)
         {
-            WayPoints.Add(new WayPoint(transform.position, transform.forward));
+            WayPoints.Add(new WayPoint(transform.position, transform.forward, transform.right));
         }
 
         public void Dispose()
