@@ -4,7 +4,6 @@
     {
         Center,
         Forward,
-        Base,
-        Ribbon
+        Base
     }
 }
