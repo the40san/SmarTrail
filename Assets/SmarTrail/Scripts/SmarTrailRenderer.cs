@@ -87,7 +87,7 @@ namespace FortyWorks.SmarTrail
 				SetupComponents();
 			
             _pointTracer.Update(transform, _tracking);
-			_baker.Bake(_pointTracer.WayPoints, transform.position);
+			_baker.Bake(_pointTracer.WayPoints, transform);
 		}
 	}
 }
