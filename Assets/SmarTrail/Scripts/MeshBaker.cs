@@ -11,31 +11,38 @@ namespace FortyWorks.SmarTrail
         private readonly float _widthMultiplier;
         private readonly Gradient _colorGradient;
         private readonly Align _align;
+        private readonly int _subdivision;
 
         public Mesh Mesh { get; private set; }
 
-        public MeshBaker(AnimationCurve widthCurve, float widthMultiplier, Gradient colorGradient, Align align)
+        public MeshBaker(
+            AnimationCurve widthCurve, 
+            float widthMultiplier, 
+            Gradient colorGradient, 
+            Align align, 
+            int subdivision)
         {
             _widthCurve = widthCurve;
             _widthMultiplier = widthMultiplier;
             _colorGradient = colorGradient;
             _align = align;
+            _subdivision = subdivision;
             
             Mesh = new Mesh();
         }
 
-        public void Bake(List<WayPoint> wayPoints, Transform transform)
+        public void Bake(WayPoint[] wayPoints, Transform transform)
         {
             Mesh.Clear();
-            if (wayPoints.Count < 2) return;
+            if (wayPoints.Length < 2) return;
 
             var offsetToCancel = transform.position;
             var rotationToCancel = transform.rotation;
 
             var vertices = CreateVertice(wayPoints, offsetToCancel).Select(x => Quaternion.Inverse(rotationToCancel) * x.Point).ToArray();
-            var uv = CreateUvMap(wayPoints.Count).ToArray();
-            var triangles = CreateTriangles(wayPoints.Count).ToArray();
-            var colors = CreateVertexColor(wayPoints).ToArray();
+            var uv = CreateUvMap(vertices.Length / 2).ToArray();
+            var triangles = CreateTriangles(vertices.Length / 2).ToArray();
+            var colors = CreateVertexColor(vertices.Length / 2).ToArray();
 
             Mesh.vertices = vertices;
             Mesh.uv = uv;
@@ -43,11 +50,11 @@ namespace FortyWorks.SmarTrail
             Mesh.colors = colors;
         }
 
-        private IEnumerable<Color> CreateVertexColor(List<WayPoint> wayPoints)
+        private IEnumerable<Color> CreateVertexColor(int pointCount)
         {
-            return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
+            return Enumerable.Range(0, pointCount).SelectMany(index =>
             {
-                var color = _colorGradient.Evaluate(1 - ((float)index / wayPoints.Count));
+                var color = _colorGradient.Evaluate(1 - ((float)index / pointCount));
                     
                 return new[]
                 {
@@ -79,13 +86,15 @@ namespace FortyWorks.SmarTrail
             });
         }
 
-        private IEnumerable<Vertex> CreateVertice(List<WayPoint> wayPoints, Vector3 offset)
+        private IEnumerable<Vertex> CreateVertice(WayPoint[] wayPoints, Vector3 offset)
         {
             var maxWidth = _widthCurve.Evaluate(0) * _widthMultiplier;
-            return Enumerable.Range(0, wayPoints.Count).SelectMany(index =>
+            var subdivided = CreateSubdividedWayPoints(wayPoints);
+
+            return Enumerable.Range(0, subdivided.Length).SelectMany(index =>
             {
-                var element = wayPoints.ElementAt(index);
-                var width = _widthCurve.Evaluate(1 - ((float)index / wayPoints.Count)) * _widthMultiplier;
+                var element = subdivided.ElementAt(index);
+                var width = _widthCurve.Evaluate(1 - ((float) index / subdivided.Length)) * _widthMultiplier;
 
                 return new[]
                 {
@@ -93,6 +102,20 @@ namespace FortyWorks.SmarTrail
                     new Vertex(element.ToForwardPosition(width, maxWidth, _align) - offset),
                 };
             });
+        }
+
+        private WayPoint[] CreateSubdividedWayPoints(WayPoint[] baseWayPoints)
+        {
+            //CatMull-Rom needs at least 4 sample points.
+            if (baseWayPoints.Length < 4)
+                return baseWayPoints;
+
+            var subdivider = new CatmullRomDivider(
+                baseWayPoints.ToArray(),
+                _subdivision
+            );
+
+            return subdivider.SubDivide();
         }
 
         public void Dispose()
