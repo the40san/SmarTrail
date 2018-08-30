@@ -12,6 +12,7 @@ namespace FortyWorks.SmarTrail
 		[SerializeField] private Gradient _color = new Gradient();
 		[SerializeField] private Align _align = Align.Forward;
 		[SerializeField] private bool _tracking = true;
+		[SerializeField] private int subdivide = 0;
 
 		private PointTracer CreatePointTracer()
 		{
@@ -20,7 +21,7 @@ namespace FortyWorks.SmarTrail
 
 		private MeshBaker CreateMeshBaker()
 		{
-			return new MeshBaker(_widthCurve, _widthMultiplier, _color, _align);
+			return new MeshBaker(_widthCurve, _widthMultiplier, _color, _align, subdivide);
 		}
 	}
 	
@@ -87,7 +88,7 @@ namespace FortyWorks.SmarTrail
 				SetupComponents();
 			
             _pointTracer.Update(transform, _tracking);
-			_baker.Bake(_pointTracer.WayPoints, transform);
+			_baker.Bake(_pointTracer.WayPoints.ToArray(), transform);
 		}
 	}
 }
