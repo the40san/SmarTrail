@@ -11,6 +11,7 @@ namespace FortyWorks.SmarTrail
         
         private readonly float _minVertexDistance;
         private readonly float _lifeTime;
+        private WayPoint _lastPointNotedByDistance;
             
         public PointTracer(float minVertexDistance,
             float lifeTime)
@@ -27,16 +28,17 @@ namespace FortyWorks.SmarTrail
 
             if (tracking == false) return;
             
-            var lastNotedPoint = WayPoints.LastOrDefault();
-            if (lastNotedPoint == null)
+            if (_lastPointNotedByDistance == null)
             {
-                Note(transform);
+                NoteAsRelay(transform);
                 return;
             }
             
-            var distanceFromLast = Vector3.Distance(transform.position, lastNotedPoint.MidPosition);
+            UpdateLastPoint(transform);
+            
+            var distanceFromLast = Vector3.Distance(transform.position, _lastPointNotedByDistance.MidPosition);
             if (distanceFromLast >= _minVertexDistance)
-                Note(transform);
+                NoteAsRelay(transform);
         }
 
         private void RemoveEolPoints()
@@ -44,9 +46,20 @@ namespace FortyWorks.SmarTrail
             WayPoints.RemoveAll(x => (Time.time - x.CreatedAt) >= _lifeTime);
         }
 
-        private void Note(Transform transform)
+        private void NoteAsRelay(Transform transform)
         {
-            WayPoints.Add(new WayPoint(transform.position, transform.forward, transform.right));
+            var waypoint = new WayPoint(transform.position, transform.forward, transform.right);
+            
+            _lastPointNotedByDistance = waypoint;
+            WayPoints.Add(waypoint);
+        }
+
+        private void UpdateLastPoint(Transform transform)
+        {
+            if (WayPoints.Count == 0)
+                return;
+                
+            WayPoints[WayPoints.Count - 1] = new WayPoint(transform.position, transform.forward, transform.right);
         }
 
         public void Dispose()
