@@ -9,7 +9,7 @@ namespace FortyWorks.SmarTrail
         private int _subDivision;
         private int _pointToPointDividecount;
         private readonly int _lineCount;
-        
+
         public CatmullRomDivider(
             WayPoint[] baseWayPoints,
             int subDivision
@@ -18,7 +18,7 @@ namespace FortyWorks.SmarTrail
             _baseWayPoints = baseWayPoints;
             _lineCount = baseWayPoints.Length;
             _subDivision = subDivision;
-            
+
             CreatePtoPDivideCount();
         }
 
@@ -32,7 +32,7 @@ namespace FortyWorks.SmarTrail
 
             _pointToPointDividecount = _subDivision / _lineCount;
         }
-        
+
         public WayPoint[] SubDivide()
         {
             return Enumerable
@@ -57,8 +57,14 @@ namespace FortyWorks.SmarTrail
                                 this._baseWayPoints[divideLineIndex + 1].MidPosition,
                                 this._baseWayPoints[divideLineIndex + 2].MidPosition
                             ),
-                            this._baseWayPoints[divideLineIndex + 1].Forward,
-                            this._baseWayPoints[divideLineIndex + 1].Right
+                            Vector3.Lerp(
+                                this._baseWayPoints[divideLineIndex].Forward,
+                                this._baseWayPoints[divideLineIndex + 2].Forward,
+                                index * step),
+                            Vector3.Lerp(
+                                this._baseWayPoints[divideLineIndex].Right,
+                                this._baseWayPoints[divideLineIndex + 1].Right,
+                                index * step)
                         );
                     }
 
@@ -71,8 +77,14 @@ namespace FortyWorks.SmarTrail
                                 this._baseWayPoints[divideLineIndex].MidPosition,
                                 this._baseWayPoints[divideLineIndex + 1].MidPosition
                             ),
-                            this._baseWayPoints[divideLineIndex].Forward,
-                            this._baseWayPoints[divideLineIndex].Right
+                            Vector3.Lerp(
+                                this._baseWayPoints[divideLineIndex - 1].Forward,
+                                this._baseWayPoints[divideLineIndex + 1].Forward,
+                                index * step),
+                            Vector3.Lerp(
+                                this._baseWayPoints[divideLineIndex].Right,
+                                this._baseWayPoints[divideLineIndex + 1].Right,
+                                index * step)
                         );
                     }
 
@@ -82,19 +94,24 @@ namespace FortyWorks.SmarTrail
                     return new WayPoint(
                         CatmullRomCommon(
                             index * step,
-                            this._baseWayPoints[divideLineIndex == 0 ? _baseWayPoints.Length - 1 : divideLineIndex - 1]
-                                .MidPosition,
+                            this._baseWayPoints[divideLineIndex - 1].MidPosition,
                             this._baseWayPoints[divideLineIndex].MidPosition,
                             this._baseWayPoints[(divideLineIndex + 1) % this._baseWayPoints.Length].MidPosition,
                             this._baseWayPoints[(divideLineIndex + 2) % this._baseWayPoints.Length].MidPosition
                         ),
-                        this._baseWayPoints[divideLineIndex].Forward,
-                        this._baseWayPoints[divideLineIndex].Right
+                        Vector3.Lerp(
+                                this._baseWayPoints[divideLineIndex].Forward,
+                                this._baseWayPoints[divideLineIndex + 1].Forward,
+                                index * step),
+                            Vector3.Lerp(
+                                this._baseWayPoints[divideLineIndex].Right,
+                                this._baseWayPoints[divideLineIndex + 1].Right,
+                                index * step)
                     );
                 }).ToArray();
         }
-        
-        private static Vector3 CatmullRomCommon(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) 
+
+        private static Vector3 CatmullRomCommon(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
         {
             Vector3 a = -p0 + 3f * p1 - 3f * p2 + p3;
             Vector3 b = 2f * p0 - 5f * p1 + 4f * p2 - p3;
@@ -104,7 +121,7 @@ namespace FortyWorks.SmarTrail
             return 0.5f * ((a * t * t * t) + (b * t * t) + (c * t) + d);
         }
 
-        private static Vector3 CatmullRomFirst(float t, Vector3 p0, Vector3 p1, Vector3 p2) 
+        private static Vector3 CatmullRomFirst(float t, Vector3 p0, Vector3 p1, Vector3 p2)
         {
             Vector3 b = p0 - 2f * p1 + p2;
             Vector3 c = -3f * p0 + 4f * p1 - p2;
@@ -112,10 +129,10 @@ namespace FortyWorks.SmarTrail
             return 0.5f * ((b * t * t) + (c * t) + d);
         }
 
-        private static Vector3 CatmullRomLast(float t, Vector3 p0, Vector3 p1, Vector3 p2) 
+        private static Vector3 CatmullRomLast(float t, Vector3 p0, Vector3 p1, Vector3 p2)
         {
             Vector3 b = p0 - 2f * p1 + p2;
-            Vector3 c = -p0 + p2;    
+            Vector3 c = -p0 + p2;
             Vector3 d = 2f * p1;
 
             return 0.5f * ((b * t * t) + (c * t) + d);
